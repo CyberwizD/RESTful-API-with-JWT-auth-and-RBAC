@@ -33,7 +33,7 @@ This repository contains a secure RESTful API built using Go that implements JWT
 ## 🛠 Getting Started:
 1. Clone the repository:
     ```bash
-    git clone https://github.com/your-username/secure-api-rbac-jwt.git
+    git clone https://github.com/CyberwizD/RESTful-API-with-JWT-auth-and-RBAC.git
     ```
 
 2. Install dependencies:
@@ -56,7 +56,7 @@ This repository contains a secure RESTful API built using Go that implements JWT
     ```
 
 ## 🛡 Contributing:
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/your-username/secure-api-rbac-jwt/issues) or open a new pull request.
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/CyberwizD/RESTful-API-with-JWT-auth-and-RBAC/issues) or open a new pull request.
 
 ## 📄 License:
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
