@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/CyberwizD/RESTful-API-with-JWT-auth-and-RBAC/config"
 	"github.com/CyberwizD/RESTful-API-with-JWT-auth-and-RBAC/internal/auth"
@@ -31,6 +32,7 @@ func NewUserService(s handlers.User) *UserService {
 func (s *UserService) RegisterRoutes(r *mux.Router) {
 	r.HandleFunc("/users/register", s.handleUserRegister).Methods("POST")
 	r.HandleFunc("/users/login", s.handleUserLogin).Methods("POST")
+	r.HandleFunc("/users/{id}", s.handlerUserId).Methods("GET")
 }
 
 func (s *UserService) handleUserRegister(w http.ResponseWriter, r *http.Request) {
@@ -81,6 +83,10 @@ func (s *UserService) handleUserRegister(w http.ResponseWriter, r *http.Request)
 	}
 
 	utils.WriteJSON(w, http.StatusCreated, token)
+
+	utils.WriteJSON(w, http.StatusCreated, utils.SuccessResponse{
+		Message: "User registered successfully",
+	})
 }
 
 func (s *UserService) handleUserLogin(w http.ResponseWriter, r *http.Request) {
@@ -105,6 +111,27 @@ func validateUserPayload(user *config.User) error {
 	}
 
 	return nil
+}
+
+func (s *UserService) handlerUserId(w http.ResponseWriter, r *http.Request) {
+	userVar := mux.Vars(r)
+	IdStr := userVar["id"]
+
+	userId, err := strconv.ParseInt(IdStr, 10, 64)
+
+	if err != nil {
+		utils.WriteJSON(w, http.StatusBadRequest, utils.ErrorResponse{Error: "User not found"})
+		return
+	}
+
+	user, err := s.user_route.GetUserById(userId)
+
+	if err != nil {
+		utils.WriteJSON(w, http.StatusBadRequest, utils.ErrorResponse{Error: "User not found"})
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, user)
 }
 
 func createAndSetAuthCookie(userID int64, w http.ResponseWriter) (string, error) {
