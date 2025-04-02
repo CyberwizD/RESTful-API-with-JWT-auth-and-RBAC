@@ -45,20 +45,30 @@ func (s *UserService) handleUserRegister(w http.ResponseWriter, r *http.Request)
 
 	defer r.Body.Close()
 
-	var payload *config.User
-
-	err = json.Unmarshal(body, &payload)
+	// Use RegisterRequest instead of User directly
+	var registerRequest *config.RegisterRequest
+	err = json.Unmarshal(body, &registerRequest)
 
 	if err != nil {
 		utils.WriteJSON(w, http.StatusBadRequest, utils.ErrorResponse{Error: "Invalid request payload"})
 		return
 	}
 
+	// Convert RegisterRequest to User
+	payload := &config.User{
+		Email:     registerRequest.Email,
+		FirstName: registerRequest.FirstName,
+		LastName:  registerRequest.LastName,
+		Password:  registerRequest.Password,
+	}
+
+	// Validate user input
 	if err := validateUserPayload(payload); err != nil {
 		utils.WriteJSON(w, http.StatusBadRequest, utils.ErrorResponse{Error: err.Error()})
 		return
 	}
 
+	// Hash password
 	hashedPassword, err := utils.HashPassword(payload.Password)
 
 	if err != nil {
@@ -68,6 +78,7 @@ func (s *UserService) handleUserRegister(w http.ResponseWriter, r *http.Request)
 
 	payload.Password = hashedPassword
 
+	// Create user in storage
 	user, err := s.user_route.CreateUser(payload)
 
 	if err != nil {
@@ -75,6 +86,7 @@ func (s *UserService) handleUserRegister(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	// Create JWT token
 	token, err := createAndSetAuthCookie(user.ID, w)
 
 	if err != nil {
@@ -82,10 +94,10 @@ func (s *UserService) handleUserRegister(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusCreated, token)
-
+	// Response: Success!
 	utils.WriteJSON(w, http.StatusCreated, utils.SuccessResponse{
 		Message: "User registered successfully",
+		Token:   token,
 	})
 }
 
