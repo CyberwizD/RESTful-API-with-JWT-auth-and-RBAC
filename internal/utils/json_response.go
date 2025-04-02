@@ -13,6 +13,7 @@ type ErrorResponse struct {
 // SuccessResponse represents a success response
 type SuccessResponse struct {
 	Message string `json:"message"`
+	Token   string `json:"token"`
 }
 
 // WriteJSON writes a JSON response to the http.ResponseWriter
