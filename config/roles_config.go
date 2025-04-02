@@ -7,7 +7,7 @@ import (
 // User represents a user in the system
 type User struct {
 	ID        int64     `json:"id"`
-	Role      string    `json:"user"`
+	Role      string    `json:"role"`
 	Email     string    `json:"email"`
 	FirstName string    `json:"firstName"`
 	LastName  string    `json:"lastName"`
@@ -18,7 +18,7 @@ type User struct {
 // Admin represents an admin in the system
 type Admin struct {
 	ID        int64     `json:"id"`
-	Role      string    `json:"admin"`
+	Role      string    `json:"role"`
 	Email     string    `json:"email"`
 	FirstName string    `json:"firstName"`
 	LastName  string    `json:"lastName"`
