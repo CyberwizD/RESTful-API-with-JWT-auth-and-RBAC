@@ -31,9 +31,9 @@ func WithJWTAuth(handlerFunc http.HandlerFunc, store handlers.User) http.Handler
 		}
 
 		claims := token.Claims.(jwt.MapClaims)
-		userID := claims["userID"].(string)
+		userID := claims["userID"].(int64)
 
-		_, err = store.GetUserByEmail(userID)
+		_, err = store.GetUserById(userID)
 		if err != nil {
 			log.Printf("failed to get user by id: %v", err)
 			permissionDenied(w)

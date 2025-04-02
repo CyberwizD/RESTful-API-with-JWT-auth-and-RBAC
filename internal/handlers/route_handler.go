@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"log"
 
 	"github.com/CyberwizD/RESTful-API-with-JWT-auth-and-RBAC/config"
 )
@@ -13,7 +14,7 @@ type Storage struct {
 type User interface {
 	// User
 	CreateUser(u *config.User) (*config.User, error)
-	GetUserByEmail(email string) (*config.User, error)
+	GetUserById(id int64) (*config.User, error)
 
 	// Admin
 	CreateAdmin(a *config.Admin) (*config.Admin, error)
@@ -28,11 +29,12 @@ func NewStorage(db *sql.DB) *Storage {
 
 func (s *Storage) CreateUser(u *config.User) (*config.User, error) {
 	rows, err := s.db.Exec(`
-		INSERT INTO users (email, firstName, lastName, password)
-		VALUES (?, ?, ?, ?)
+		INSERT INTO users (email, firstName, lastName, password, role)
+		VALUES (?, ?, ?, ?, 'user')
 	`, u.Email, u.FirstName, u.LastName, u.Password)
 
 	if err != nil {
+		log.Printf("Error inserting user: %v", err)
 		return nil, err
 	}
 
@@ -43,15 +45,16 @@ func (s *Storage) CreateUser(u *config.User) (*config.User, error) {
 	}
 
 	u.ID = id
+	u.Role = "user"
 
 	return u, nil
 }
 
 // GetUserByEmail retrieves an admin user by their email.
-func (s *Storage) GetUserByEmail(email string) (*config.User, error) {
+func (s *Storage) GetUserById(id int64) (*config.User, error) {
 	var user config.User
-	query := "SELECT id, email, role FROM users WHERE email = ? AND role = 'user'"
-	err := s.db.QueryRow(query, email).Scan(&user.ID, &user.Email, &user.Role)
+	query := "SELECT id, email, firstName, lastName, role FROM users WHERE id = ? AND role = 'user'"
+	err := s.db.QueryRow(query, id).Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName, &user.Role)
 
 	if err != nil {
 		return nil, err
@@ -62,8 +65,8 @@ func (s *Storage) GetUserByEmail(email string) (*config.User, error) {
 
 func (s *Storage) CreateAdmin(a *config.Admin) (*config.Admin, error) {
 	rows, err := s.db.Exec(`
-		INSERT INTO admins (email, firstName, lastName, password)
-		VALUES (?, ?, ?, ?)
+		INSERT INTO admins (email, firstName, lastName, password, role)
+		VALUES (?, ?, ?, ?, 'admin')
 	`, a.Email, a.FirstName, a.LastName, a.Password)
 
 	if err != nil {
@@ -77,6 +80,7 @@ func (s *Storage) CreateAdmin(a *config.Admin) (*config.Admin, error) {
 	}
 
 	a.ID = id
+	a.Role = "admin"
 
 	return a, nil
 }
