@@ -16,6 +16,7 @@ type User interface {
 	// User
 	CreateUser(u *config.User) (*config.User, error)
 	GetUserById(id int64) (*config.User, error)
+	DeleteUser(del *config.User) (*config.User, error)
 
 	// Admin
 	CreateAdmin(a *config.Admin) (*config.Admin, error)
@@ -64,6 +65,10 @@ func (s *Storage) CreateUser(u *config.User) (*config.User, error) {
 	u.Role = "user"
 
 	return u, nil
+}
+
+func (s *Storage) DeleteUser(del *config.User) (*config.User, error) {
+	return nil, nil
 }
 
 // GetUserByEmail retrieves an admin user by their email.
