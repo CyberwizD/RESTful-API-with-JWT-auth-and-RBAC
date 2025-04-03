@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 
 	"github.com/CyberwizD/RESTful-API-with-JWT-auth-and-RBAC/config"
@@ -28,6 +29,21 @@ func NewStorage(db *sql.DB) *Storage {
 }
 
 func (s *Storage) CreateUser(u *config.User) (*config.User, error) {
+	var exists bool
+
+	// Check if the email already exists in the database
+	err := s.db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE email = ?)", u.Email).Scan(&exists)
+
+	if err != nil {
+		log.Printf("Error checking user existence: %v", err)
+		return nil, err
+	}
+
+	if exists {
+		return nil, errors.New("user with this email already exists")
+	}
+
+	// Insert the new user if the email does not exist
 	rows, err := s.db.Exec(`
 		INSERT INTO users (email, firstName, lastName, password, role)
 		VALUES (?, ?, ?, ?, 'user')
