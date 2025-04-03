@@ -33,6 +33,7 @@ func (s *UserService) RegisterRoutes(r *mux.Router) {
 	r.HandleFunc("/users/register", s.handleUserRegister).Methods("POST")
 	r.HandleFunc("/users/login", s.handleUserLogin).Methods("POST")
 	r.HandleFunc("/users/{id}", s.handlerUserId).Methods("GET")
+	r.HandleFunc("/users/{id}", s.handleUserDelete).Methods("DELETE")
 }
 
 func (s *UserService) handleUserRegister(w http.ResponseWriter, r *http.Request) {
@@ -126,7 +127,7 @@ func (s *UserService) handleUserLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validate user input
-	if err := validateLoginPayload(payload); err != nil {
+	if err := validatePayload(payload); err != nil {
 		utils.WriteJSON(w, http.StatusBadRequest, utils.ErrorResponse{Error: err.Error()})
 		return
 	}
@@ -137,7 +138,7 @@ func (s *UserService) handleUserLogin(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func validateLoginPayload(user *config.User) error {
+func validatePayload(user *config.User) error {
 	if user.Email == "" {
 		return errEmailRequired
 	}
@@ -188,6 +189,42 @@ func (s *UserService) handlerUserId(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteJSON(w, http.StatusOK, user)
+}
+
+func (s *UserService) handleUserDelete(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+
+	if err != nil {
+		http.Error(w, "Error reading request body", http.StatusBadRequest)
+		return
+	}
+
+	defer r.Body.Close()
+
+	// Use LoginRequest struct
+	var deleteRequest *config.LoginRequest
+	err = json.Unmarshal(body, &deleteRequest)
+
+	if err != nil {
+		utils.WriteJSON(w, http.StatusBadRequest, utils.ErrorResponse{Error: "Invalid request payload"})
+		return
+	}
+
+	payload := &config.User{
+		Email:    deleteRequest.Email,
+		Password: deleteRequest.Password,
+	}
+
+	// Validate user input
+	if err := validatePayload(payload); err != nil {
+		utils.WriteJSON(w, http.StatusBadRequest, utils.ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	// Response Success!
+	utils.WriteJSON(w, http.StatusCreated, utils.DeleteSuccessResponse{
+		Message: "User deleted successfully",
+	})
 }
 
 func createAndSetAuthCookie(userID int64, w http.ResponseWriter) (string, error) {
