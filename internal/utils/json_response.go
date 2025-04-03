@@ -15,6 +15,10 @@ type LoginSuccessResponse struct {
 	Message string `json:"message"`
 }
 
+type DeleteSuccessResponse struct {
+	Message string `json:"message"`
+}
+
 // RegisterResponse represents a success response
 type RegisterSuccessResponse struct {
 	Message string `json:"message"`
