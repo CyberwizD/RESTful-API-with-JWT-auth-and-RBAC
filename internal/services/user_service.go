@@ -82,7 +82,7 @@ func (s *UserService) handleUserRegister(w http.ResponseWriter, r *http.Request)
 	user, err := s.user_route.CreateUser(payload)
 
 	if err != nil {
-		utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrorResponse{Error: "Error creating user"})
+		utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrorResponse{Error: "Error creating user account"})
 		return
 	}
 
