@@ -10,8 +10,13 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
-// SuccessResponse represents a success response
-type SuccessResponse struct {
+// LoginResponse
+type LoginSuccessResponse struct {
+	Message string `json:"message"`
+}
+
+// RegisterResponse represents a success response
+type RegisterSuccessResponse struct {
 	Message string `json:"message"`
 	Token   string `json:"token"`
 }

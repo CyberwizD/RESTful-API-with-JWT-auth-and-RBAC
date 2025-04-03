@@ -95,14 +95,58 @@ func (s *UserService) handleUserRegister(w http.ResponseWriter, r *http.Request)
 	}
 
 	// Response: Success!
-	utils.WriteJSON(w, http.StatusCreated, utils.SuccessResponse{
+	utils.WriteJSON(w, http.StatusCreated, utils.RegisterSuccessResponse{
 		Message: "User registered successfully",
 		Token:   token,
 	})
 }
 
 func (s *UserService) handleUserLogin(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
 
+	if err != nil {
+		http.Error(w, "Error reading request body", http.StatusBadRequest)
+		return
+	}
+
+	defer r.Body.Close()
+
+	// Use LoginRequest struct
+	var loginRequest *config.LoginRequest
+	err = json.Unmarshal(body, &loginRequest)
+
+	if err != nil {
+		utils.WriteJSON(w, http.StatusBadRequest, utils.ErrorResponse{Error: "Invalid request payload"})
+		return
+	}
+
+	payload := &config.User{
+		Email:    loginRequest.Email,
+		Password: loginRequest.Password,
+	}
+
+	// Validate user input
+	if err := validateLoginPayload(payload); err != nil {
+		utils.WriteJSON(w, http.StatusBadRequest, utils.ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	// Response Success!
+	utils.WriteJSON(w, http.StatusCreated, utils.LoginSuccessResponse{
+		Message: "User login successfully",
+	})
+}
+
+func validateLoginPayload(user *config.User) error {
+	if user.Email == "" {
+		return errEmailRequired
+	}
+
+	if user.Password == "" {
+		return errPasswordRequired
+	}
+
+	return nil
 }
 
 func validateUserPayload(user *config.User) error {
