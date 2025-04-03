@@ -53,6 +53,7 @@ func (s *MySQLStorage) createUsersTable() error {
 			firstName VARCHAR(255) NOT NULL,
 			lastName VARCHAR(255) NOT NULL,
 			password VARCHAR(255) NOT NULL,
+			role ENUM('user', 'admin') NOT NULL DEFAULT 'user',
 			createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 			PRIMARY KEY (id),
@@ -75,6 +76,7 @@ func (s *MySQLStorage) createAdminsTable() error {
 			firstName VARCHAR(255) NOT NULL,
 			lastName VARCHAR(255) NOT NULL,
 			password VARCHAR(255) NOT NULL,
+			role ENUM('user', 'admin') NOT NULL DEFAULT 'admin',
 			createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 			PRIMARY KEY (id),
