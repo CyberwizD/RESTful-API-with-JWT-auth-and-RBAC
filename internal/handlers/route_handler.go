@@ -68,7 +68,28 @@ func (s *Storage) CreateUser(u *config.User) (*config.User, error) {
 }
 
 func (s *Storage) DeleteUser(del *config.User) (*config.User, error) {
-	return nil, nil
+	// Check if the user exists before attempting to delete
+	var exists bool
+	err := s.db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE id = ? AND role = 'user')", del.ID).Scan(&exists)
+
+	if err != nil {
+		log.Printf("Error checking user existence: %v", err)
+		return nil, err
+	}
+
+	if !exists {
+		return nil, errors.New("user does not exist")
+	}
+
+	// Delete the user from the database
+	_, err = s.db.Exec("DELETE FROM users WHERE id = ? AND role = 'user'", del.ID)
+
+	if err != nil {
+		log.Printf("Error deleting user: %v", err)
+		return nil, err
+	}
+
+	return del, nil
 }
 
 // GetUserByEmail retrieves an admin user by their email.
