@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -220,6 +221,18 @@ func (s *UserService) handleUserDelete(w http.ResponseWriter, r *http.Request) {
 		utils.WriteJSON(w, http.StatusBadRequest, utils.ErrorResponse{Error: err.Error()})
 		return
 	}
+
+	// Delete user in storage
+	deleteUser, err := s.user_route.DeleteUser(payload)
+
+	if err != nil {
+		utils.WriteJSON(w, http.StatusBadRequest, utils.ErrorResponse{Error: "User not found"})
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusNotFound, utils.DeleteSuccessResponse{
+		Message: fmt.Sprintf("User %v not found", deleteUser.Email),
+	})
 
 	// Response Success!
 	utils.WriteJSON(w, http.StatusCreated, utils.DeleteSuccessResponse{
