@@ -1,12 +1,20 @@
 services:
   mysql:
-      image: mysql:latest
+      image: mysql
       container_name: mysql-go
       environment:
-        MYSQL_PASSWORD: 
+        MYSQL_ROOT_PASSWORD: password
       ports:
-      - "3309:3309"
-      network:
+      - "3306:3306"
+      networks:
       - rest-api-go
       volumes:
-      - mysql-go:/var/lib/mysql/data
+      - mysql-go:/var/lib/mysql
+
+volumes:
+  mysql-go:
+    driver: local
+  
+networks:
+  rest-api-go:
+    driver: bridge
