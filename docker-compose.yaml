@@ -1,0 +1,12 @@
+services:
+  mysql:
+      image: mysql:latest
+      container_name: mysql-go
+      environment:
+        MYSQL_PASSWORD: 
+      ports:
+      - "3309:3309"
+      network:
+      - rest-api-go
+      volumes:
+      - mysql-go:/var/lib/mysql/data
